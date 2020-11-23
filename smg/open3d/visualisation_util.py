@@ -33,9 +33,9 @@ class VisualisationUtil:
     @staticmethod
     def visualise_geometry(geom: o3d.geometry.Geometry) -> None:
         """
-        TODO
+        Visualise some Open3D geometry.
 
-        :param geom:    TODO
+        :param geom:    The geometry to visualise.
         """
         # Set up the visualisation.
         vis = o3d.visualization.Visualizer()
@@ -61,15 +61,20 @@ class VisualisationUtil:
     def visualise_rgbd_image(colour_image: np.ndarray, depth_image: np.ndarray,
                              intrinsics: Tuple[float, float, float, float]) -> None:
         """
-        TODO
+        Visualise an RGB-D image in 3D.
 
-        :param colour_image:    TODO
-        :param depth_image:     TODO
-        :param intrinsics:      TODO
+        :param colour_image:    The colour image.
+        :param depth_image:     The depth image.
+        :param intrinsics:      The camera intrinsics.
         """
+        # Make a coloured point cloud from the RGB-D image.
         depth_mask: np.ndarray = np.where(depth_image != 0, 255, 0).astype(np.uint8)
         pcd_points, pcd_colours = GeometryUtil.make_point_cloud(colour_image, depth_image, depth_mask, intrinsics)
+
+        # Convert it to Open3D format.
         pcd: o3d.geometry.PointCloud = o3d.geometry.PointCloud()
         pcd.points = o3d.utility.Vector3dVector(pcd_points)
         pcd.colors = o3d.utility.Vector3dVector(pcd_colours)
+
+        # Visualise it.
         VisualisationUtil.visualise_geometry(pcd)
