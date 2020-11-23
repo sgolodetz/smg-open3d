@@ -16,7 +16,8 @@ setup(
     include_package_data=True,
     install_requires=[
         "numpy",
-        "open3d"
+        "open3d",
+        "smg-utility"
     ],
     classifiers=[
         "Programming Language :: Python :: 3",

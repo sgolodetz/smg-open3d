@@ -3,9 +3,11 @@ import open3d as o3d
 
 from typing import Optional, Tuple
 
+from smg.utility import GeometryUtil
+
 
 class VisualisationUtil:
-    """TODO"""
+    """Utility functions related to Open3D visualisations."""
 
     # PUBLIC STATIC METHODS
 
@@ -54,3 +56,20 @@ class VisualisationUtil:
 
         # Run the visualiser.
         vis.run()
+
+    @staticmethod
+    def visualise_rgbd_image(colour_image: np.ndarray, depth_image: np.ndarray,
+                             intrinsics: Tuple[float, float, float, float]) -> None:
+        """
+        TODO
+
+        :param colour_image:    TODO
+        :param depth_image:     TODO
+        :param intrinsics:      TODO
+        """
+        depth_mask: np.ndarray = np.where(depth_image != 0, 255, 0).astype(np.uint8)
+        pcd_points, pcd_colours = GeometryUtil.make_point_cloud(colour_image, depth_image, depth_mask, intrinsics)
+        pcd: o3d.geometry.PointCloud = o3d.geometry.PointCloud()
+        pcd.points = o3d.utility.Vector3dVector(pcd_points)
+        pcd.colors = o3d.utility.Vector3dVector(pcd_colours)
+        VisualisationUtil.visualise_geometry(pcd)
