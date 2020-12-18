@@ -9,13 +9,13 @@ from smg.utility.trajectory_util import TrajectoryUtil
 
 def main():
     relocaliser_trajectory: List[Tuple[float, np.ndarray]] = TrajectoryUtil.load_tum_trajectory(
-        "C:/smglib/smg-relocalisation/examples/relocaliser_trajectory.txt"
+        "C:/smglib/smg-relocalisation/examples/trajectory-relocaliser.txt"
     )
     tracker_trajectory: List[Tuple[float, np.ndarray]] = TrajectoryUtil.load_tum_trajectory(
-        "C:/smglib/smg-relocalisation/examples/tracker_trajectory.txt"
+        "C:/smglib/smg-relocalisation/examples/trajectory-tracker.txt"
     )
     unscaled_tracker_trajectory: List[Tuple[float, np.ndarray]] = TrajectoryUtil.load_tum_trajectory(
-        "C:/smglib/smg-relocalisation/examples/unscaled_tracker_trajectory.txt"
+        "C:/smglib/smg-relocalisation/examples/trajectory-tracker-unscaled.txt"
     )
 
     relocaliser_trajectory = TrajectoryUtil.smooth_trajectory(relocaliser_trajectory)
