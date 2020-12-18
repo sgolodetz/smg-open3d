@@ -11,9 +11,11 @@ def main():
     relocaliser_trajectory: List[Tuple[float, np.ndarray]] = TrajectoryUtil.load_tum_trajectory(
         "C:/smglib/smg-relocalisation/examples/relocaliser_trajectory.txt"
     )
-
     tracker_trajectory: List[Tuple[float, np.ndarray]] = TrajectoryUtil.load_tum_trajectory(
         "C:/smglib/smg-relocalisation/examples/tracker_trajectory.txt"
+    )
+    unscaled_tracker_trajectory: List[Tuple[float, np.ndarray]] = TrajectoryUtil.load_tum_trajectory(
+        "C:/smglib/smg-relocalisation/examples/unscaled_tracker_trajectory.txt"
     )
 
     grid: LineSet = VisualisationUtil.make_voxel_grid([-2, -2, -2], [2, 0, 2], [1, 1, 1])
@@ -21,9 +23,14 @@ def main():
         relocaliser_trajectory, (0.0, 1.0, 0.0)
     )
     tracker_geoms: List[Geometry] = VisualisationUtil.make_geometries_for_trajectory(
-        tracker_trajectory, (1.0, 0.0, 0.0)
+        tracker_trajectory, (0.0, 0.0, 1.0)
     )
-    VisualisationUtil.visualise_geometries([grid] + relocaliser_geoms + tracker_geoms, axis_size=0.1)
+    unscaled_tracker_geoms: List[Geometry] = VisualisationUtil.make_geometries_for_trajectory(
+        unscaled_tracker_trajectory, (1.0, 0.0, 0.0)
+    )
+    VisualisationUtil.visualise_geometries(
+        [grid] + relocaliser_geoms + tracker_geoms + unscaled_tracker_geoms
+    )
 
 
 if __name__ == "__main__":
