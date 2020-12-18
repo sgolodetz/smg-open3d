@@ -1,7 +1,9 @@
 import copy
+import math
 import numpy as np
 import open3d as o3d
 
+from itertools import product
 from typing import List, Optional, Tuple
 
 from open3d.cpu.pybind.geometry import Geometry, TriangleMesh
@@ -123,6 +125,41 @@ class VisualisationUtil:
         )
         lines.colors = o3d.utility.Vector3dVector(colours)
         return [lines]
+
+    @staticmethod
+    def make_voxel_grid(mins: List[float], maxs: List[float], voxel_size: List[float]) -> o3d.geometry.LineSet:
+        """
+        Make a wireframe Open3D voxel grid.
+
+        :param mins:        The minimum bounds of the voxel grid.
+        :param maxs:        The maximum bounds of the voxel grid.
+        :param voxel_size:  The voxel size.
+        :return:            The voxel grid.
+        """
+        vals = {}
+        for i in range(3):
+            maxs[i] = mins[i] + math.ceil((maxs[i] - mins[i]) / voxel_size[i]) * voxel_size[i]
+            vals[i] = np.linspace(mins[i], maxs[i], int((maxs[i] - mins[i]) / voxel_size[i]) + 1)
+
+        xpts1 = [(mins[0], y, z) for y, z in product(vals[1], vals[2])]
+        xpts2 = [(maxs[0], y, z) for y, z in product(vals[1], vals[2])]
+
+        ypts1 = [(x, mins[1], z) for x, z in product(vals[0], vals[2])]
+        ypts2 = [(x, maxs[1], z) for x, z in product(vals[0], vals[2])]
+
+        zpts1 = [(x, y, mins[2]) for x, y in product(vals[0], vals[1])]
+        zpts2 = [(x, y, maxs[2]) for x, y in product(vals[0], vals[1])]
+
+        pts1 = xpts1 + ypts1 + zpts1
+        pts2 = xpts2 + ypts2 + zpts2
+        corrs = [(i, i) for i in range(len(pts1))]
+
+        pcd1 = o3d.geometry.PointCloud()
+        pcd2 = o3d.geometry.PointCloud()
+        pcd1.points = o3d.utility.Vector3dVector(pts1)
+        pcd2.points = o3d.utility.Vector3dVector(pts2)
+
+        return o3d.geometry.LineSet.create_from_point_cloud_correspondences(pcd1, pcd2, corrs)
 
     @staticmethod
     def visualise_geometries(geoms: List[Geometry], *, axis_size: float = 0.1) -> None:

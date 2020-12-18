@@ -1,6 +1,6 @@
 import numpy as np
 
-from argparse import ArgumentParser
+from open3d.cpu.pybind.geometry import Geometry, LineSet
 from typing import List, Tuple
 
 from smg.open3d.visualisation_util import VisualisationUtil
@@ -16,9 +16,14 @@ def main():
         "C:/smglib/smg-relocalisation/examples/tracker_trajectory.txt"
     )
 
-    relocaliser_geoms = VisualisationUtil.make_geometries_for_trajectory(relocaliser_trajectory, (0.0, 1.0, 0.0))
-    tracker_geoms = VisualisationUtil.make_geometries_for_trajectory(tracker_trajectory, (1.0, 0.0, 0.0))
-    VisualisationUtil.visualise_geometries(relocaliser_geoms + tracker_geoms, axis_size=0.1)
+    grid: LineSet = VisualisationUtil.make_voxel_grid([-2, -2, -2], [2, 0, 2], [1, 1, 1])
+    relocaliser_geoms: List[Geometry] = VisualisationUtil.make_geometries_for_trajectory(
+        relocaliser_trajectory, (0.0, 1.0, 0.0)
+    )
+    tracker_geoms: List[Geometry] = VisualisationUtil.make_geometries_for_trajectory(
+        tracker_trajectory, (1.0, 0.0, 0.0)
+    )
+    VisualisationUtil.visualise_geometries([grid] + relocaliser_geoms + tracker_geoms, axis_size=0.1)
 
 
 if __name__ == "__main__":
