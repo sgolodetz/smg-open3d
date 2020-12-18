@@ -1,4 +1,3 @@
-import copy
 import math
 import numpy as np
 import open3d as o3d
@@ -88,6 +87,7 @@ class VisualisationUtil:
         pcd1.points = o3d.utility.Vector3dVector(pts1)
         pcd2.points = o3d.utility.Vector3dVector(pts2)
 
+        # noinspection PyCallByClass
         return o3d.geometry.LineSet.create_from_point_cloud_correspondences(pcd1, pcd2, corrs)
 
     @staticmethod
