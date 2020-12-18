@@ -84,8 +84,28 @@ class VisualisationUtil:
 
         return geoms
 
+    # @staticmethod
+    # def make_geometries_for_trajectory(trajectory: np.ndarray, colour: Tuple[float, float, float]) -> List[Geometry]:
+    #     """
+    #     Make the line segments needed to visualise a trajectory.
+    #
+    #     :param trajectory:  The trajectory to visualise.
+    #     :param colour:      The colour to use for the line segments.
+    #     :return:            A list containing the line segments.
+    #     """
+    #     frame_count = len(trajectory)
+    #     line_indices = np.array(list(zip(np.arange(frame_count - 1), np.arange(1, frame_count))))
+    #     colours = [colour for _ in range(len(line_indices))]
+    #     lines = o3d.geometry.LineSet(
+    #         points=o3d.utility.Vector3dVector(trajectory[:, :, -1]),
+    #         lines=o3d.utility.Vector2iVector(line_indices),
+    #     )
+    #     lines.colors = o3d.utility.Vector3dVector(colours)
+    #     return [lines]
+
     @staticmethod
-    def make_geometries_for_trajectory(trajectory: np.ndarray, colour: Tuple[float, float, float]) -> List[Geometry]:
+    def make_geometries_for_trajectory(trajectory: List[Tuple[float, np.ndarray]],
+                                       colour: Tuple[float, float, float]) -> List[Geometry]:
         """
         Make the line segments needed to visualise a trajectory.
 
@@ -93,22 +113,24 @@ class VisualisationUtil:
         :param colour:      The colour to use for the line segments.
         :return:            A list containing the line segments.
         """
-        frame_count = len(trajectory)
-        line_indices = np.array(list(zip(np.arange(frame_count - 1), np.arange(1, frame_count))))
-        colours = [colour for _ in range(len(line_indices))]
-        lines = o3d.geometry.LineSet(
-            points=o3d.utility.Vector3dVector(trajectory[:, :, -1]),
+        length: int = len(trajectory)
+        points: List[np.ndarray] = [pose[0:3, 3] for _, pose in trajectory]
+        line_indices: np.ndarray = np.array(list(zip(np.arange(length - 1), np.arange(1, length))))
+        colours: List[Tuple[float, float, float]] = [colour for _ in range(len(line_indices))]
+        lines: o3d.geometry.LineSet = o3d.geometry.LineSet(
+            points=o3d.utility.Vector3dVector(points),
             lines=o3d.utility.Vector2iVector(line_indices),
         )
         lines.colors = o3d.utility.Vector3dVector(colours)
         return [lines]
 
     @staticmethod
-    def visualise_geometry(geom: o3d.geometry.Geometry) -> None:
+    def visualise_geometries(geoms: List[Geometry], *, axis_size: float = 0.1) -> None:
         """
-        Visualise some Open3D geometry.
+        Visualise some Open3D geometries.
 
-        :param geom:    The geometry to visualise.
+        :param geoms:       The geometries to visualise.
+        :param axis_size:   The size of the coordinate axes to add.
         """
         # Set up the visualisation.
         vis = o3d.visualization.Visualizer()
@@ -117,9 +139,11 @@ class VisualisationUtil:
         render_option: o3d.visualization.RenderOption = vis.get_render_option()
         render_option.line_width = 10
 
-        # noinspection PyTypeChecker
-        vis.add_geometry(geom)
-        VisualisationUtil.add_axis(vis, np.eye(4), size=0.1)
+        for geom in geoms:
+            # noinspection PyTypeChecker
+            vis.add_geometry(geom)
+
+        VisualisationUtil.add_axis(vis, np.eye(4), size=axis_size)
 
         # Set the initial pose for the visualiser.
         params = vis.get_view_control().convert_to_pinhole_camera_parameters()
@@ -129,6 +153,15 @@ class VisualisationUtil:
 
         # Run the visualiser.
         vis.run()
+
+    @staticmethod
+    def visualise_geometry(geom: o3d.geometry.Geometry) -> None:
+        """
+        Visualise an Open3D geometry.
+
+        :param geom:    The geometry to visualise.
+        """
+        VisualisationUtil.visualise_geometries([geom])
 
     @staticmethod
     def visualise_rgbd_image(colour_image: np.ndarray, depth_image: np.ndarray,
