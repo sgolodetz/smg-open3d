@@ -2,11 +2,11 @@ import numpy as np
 import open3d as o3d
 import os
 
-from argparse import ArgumentParser
 from open3d.cpu.pybind.geometry import Geometry
 from typing import List
 
-from smg.open3d.trajectory_util import TrajectoryUtil
+from smg.open3d.visualisation_util import VisualisationUtil
+from smg.utility.trajectory_util import TrajectoryUtil
 
 
 def main():
@@ -34,9 +34,9 @@ def main():
     )
 
     # Make the Open3D geometries needed.
-    camera_geoms: List[Geometry] = TrajectoryUtil.make_geometries_for_trajectory(camera_traj, colour=(0, 0, 1))
-    gt_geoms: List[Geometry] = TrajectoryUtil.make_geometries_for_trajectory(gt_traj, colour=(0, 0.75, 0))
-    keyframe_geoms: List[Geometry] = TrajectoryUtil.make_geometries_for_keyframes(
+    camera_geoms: List[Geometry] = VisualisationUtil.make_geometries_for_trajectory(camera_traj, colour=(0, 0, 1))
+    gt_geoms: List[Geometry] = VisualisationUtil.make_geometries_for_trajectory(gt_traj, colour=(0, 0.75, 0))
+    keyframe_geoms: List[Geometry] = VisualisationUtil.make_geometries_for_keyframes(
         keyframe_timestamps, camera_timestamps, gt_timestamps, camera_traj, gt_traj
     )
 
