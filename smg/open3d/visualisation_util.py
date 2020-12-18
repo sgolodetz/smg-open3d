@@ -6,7 +6,7 @@ import open3d as o3d
 from itertools import product
 from typing import List, Optional, Tuple
 
-from open3d.cpu.pybind.geometry import Geometry, TriangleMesh
+from open3d.cpu.pybind.geometry import Geometry
 from smg.utility import GeometryUtil
 
 
@@ -33,77 +33,6 @@ class VisualisationUtil:
         axes.transform(pose)
         # noinspection PyTypeChecker
         vis.add_geometry(axes)
-
-    @staticmethod
-    def make_geometries_for_keyframes(keyframe_timestamps: List[float], camera_timestamps: List[float],
-                                      gt_timestamps: List[float], camera_traj: np.ndarray, gt_traj: np.ndarray) \
-            -> List[Geometry]:
-        """
-        Make the connected axes needed to visualise the keyframes for the camera and ground truth trajectories.
-
-        :param keyframe_timestamps: The timestamps for the keyframe trajectory.
-        :param camera_timestamps:   The timestamps for the camera trajectory.
-        :param gt_timestamps:       The timestamps for the ground truth trajectory.
-        :param camera_traj:         The camera trajectory.
-        :param gt_traj:             The ground truth trajectory.
-        :return:                    A list containing the connected axes.
-        """
-        geoms = []
-
-        # noinspection PyArgumentList
-        base_axis: TriangleMesh = o3d.geometry.TriangleMesh.create_coordinate_frame(size=0.05)
-
-        camera_idx: int = 0
-        gt_idx: int = 0
-
-        # For each keyframe:
-        for keyframe_idx, keyframe_timestamp in enumerate(keyframe_timestamps):
-            # Find the relevant camera and ground truth poses.
-            while camera_idx < len(camera_timestamps) and camera_timestamps[camera_idx] < keyframe_timestamp:
-                camera_idx += 1
-            while gt_idx < len(gt_timestamps) and gt_timestamps[gt_idx] < keyframe_timestamp:
-                gt_idx += 1
-            if camera_idx == len(camera_timestamps) or gt_idx == len(gt_timestamps):
-                break
-            poses: List[np.ndarray] = [camera_traj[camera_idx], gt_traj[gt_idx]]
-
-            # Add one axis for the camera keyframe and one for the ground truth keyframe.
-            for pose in poses:
-                r, t = pose[0:3, 0:3], pose[0:3, 3]
-                axis: TriangleMesh = copy.deepcopy(base_axis)
-                # noinspection PyArgumentList
-                axis.rotate(r, center=(0, 0, 0))
-                axis.translate(t)
-                geoms.append(axis)
-
-            # Add a line segment connecting the two axes, to show the error.
-            line = o3d.geometry.LineSet(
-                points=o3d.utility.Vector3dVector(np.vstack(list(pose[0:3, 3] for pose in poses))),
-                lines=o3d.utility.Vector2iVector(np.array([0, 1], ndmin=2)),
-            )
-            line.paint_uniform_color([1, 0, 0])
-            geoms.append(line)
-
-        return geoms
-
-    # @staticmethod
-    # def make_geometries_for_trajectory(trajectory: np.ndarray, colour: Tuple[float, float, float]) -> List[Geometry]:
-    #     """
-    #     Make the line segments needed to visualise a trajectory.
-    #
-    #     :param trajectory:  The trajectory to visualise.
-    #     :param colour:      The colour to use for the line segments.
-    #     :return:            A list containing the line segments.
-    #     """
-    #     frame_count = len(trajectory)
-    #     line_indices = np.array(list(zip(np.arange(frame_count - 1), np.arange(1, frame_count))))
-    #     colours = [colour for _ in range(len(line_indices))]
-    #     lines = o3d.geometry.LineSet(
-    #         points=o3d.utility.Vector3dVector(trajectory[:, :, -1]),
-    #         lines=o3d.utility.Vector2iVector(line_indices),
-    #     )
-    #     lines.colors = o3d.utility.Vector3dVector(colours)
-    #     return [lines]
 
     @staticmethod
     def make_geometries_for_trajectory(trajectory: List[Tuple[float, np.ndarray]],
