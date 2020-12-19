@@ -3,9 +3,9 @@ import numpy as np
 import open3d as o3d
 
 from itertools import product
+from open3d.cpu.pybind.geometry import Geometry
 from typing import List, Optional, Tuple
 
-from open3d.cpu.pybind.geometry import Geometry
 from smg.utility import GeometryUtil
 
 
