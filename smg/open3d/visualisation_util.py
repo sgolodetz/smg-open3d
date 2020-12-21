@@ -3,7 +3,6 @@ import numpy as np
 import open3d as o3d
 
 from itertools import product
-from open3d.cpu.pybind.geometry import Geometry
 from typing import List, Optional, Tuple
 
 from smg.utility import GeometryUtil
@@ -34,14 +33,14 @@ class VisualisationUtil:
         vis.add_geometry(axes)
 
     @staticmethod
-    def make_geometries_for_trajectory(trajectory: List[Tuple[float, np.ndarray]],
-                                       colour: Tuple[float, float, float]) -> List[Geometry]:
+    def make_trajectory_segments(trajectory: List[Tuple[float, np.ndarray]], *, colour: Tuple[float, float, float]) \
+            -> o3d.geometry.LineSet:
         """
         Make the line segments needed to visualise a trajectory.
 
         :param trajectory:  The trajectory to visualise.
         :param colour:      The colour to use for the line segments.
-        :return:            A list containing the line segments.
+        :return:            The line segments.
         """
         length: int = len(trajectory)
         points: List[np.ndarray] = [pose[0:3, 3] for _, pose in trajectory]
@@ -52,7 +51,7 @@ class VisualisationUtil:
             lines=o3d.utility.Vector2iVector(line_indices),
         )
         lines.colors = o3d.utility.Vector3dVector(colours)
-        return [lines]
+        return lines
 
     @staticmethod
     def make_voxel_grid(mins: List[float], maxs: List[float], voxel_size: List[float]) -> o3d.geometry.LineSet:
@@ -91,7 +90,7 @@ class VisualisationUtil:
         return o3d.geometry.LineSet.create_from_point_cloud_correspondences(pcd1, pcd2, corrs)
 
     @staticmethod
-    def visualise_geometries(geoms: List[Geometry], *, axis_size: float = 0.1) -> None:
+    def visualise_geometries(geoms: List[o3d.geometry.Geometry], *, axis_size: float = 0.1) -> None:
         """
         Visualise some Open3D geometries.
 
