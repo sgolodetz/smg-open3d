@@ -120,13 +120,14 @@ class VisualisationUtil:
         vis.run()
 
     @staticmethod
-    def visualise_geometry(geom: o3d.geometry.Geometry) -> None:
+    def visualise_geometry(geom: o3d.geometry.Geometry, *, axis_size: float = 0.1) -> None:
         """
         Visualise an Open3D geometry.
 
-        :param geom:    The geometry to visualise.
+        :param geom:        The geometry to visualise.
+        :param axis_size:   The size of the coordinate axes to add.
         """
-        VisualisationUtil.visualise_geometries([geom])
+        VisualisationUtil.visualise_geometries([geom], axis_size=axis_size)
 
     @staticmethod
     def visualise_rgbd_image(colour_image: np.ndarray, depth_image: np.ndarray,
