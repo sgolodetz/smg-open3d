@@ -12,23 +12,22 @@ class VisualisationUtil:
     # PUBLIC STATIC METHODS
 
     @staticmethod
-    def add_axis(vis: o3d.visualization.Visualizer, pose: np.ndarray, *,
-                 colour: Optional[Tuple[float, float, float]] = None, size: float = 1.0) -> None:
+    def make_axes(pose: np.ndarray, *, colour: Optional[Tuple[float, float, float]] = None,
+                  size: float = 1.0) -> o3d.geometry.TriangleMesh:
         """
-        Add to the specified Open3D visualisation a set of axes for the specified pose.
+        Make a set of axes for the specified pose.
 
-        :param vis:     The Open3D visualisation.
         :param pose:    The pose (specified in camera space).
         :param colour:  An optional colour with which to paint the axes.
         :param size:    The size to give the axes (defaults to 1).
+        :return:        The set of axes.
         """
         # noinspection PyArgumentList
         axes: o3d.geometry.TriangleMesh = o3d.geometry.TriangleMesh.create_coordinate_frame(size=size)
         if colour is not None:
             axes.paint_uniform_color(colour)
         axes.transform(pose)
-        # noinspection PyTypeChecker
-        vis.add_geometry(axes)
+        return axes
 
     @staticmethod
     def make_trajectory_segments(trajectory: List[Tuple[float, np.ndarray]], *, colour: Tuple[float, float, float]) \
@@ -91,7 +90,8 @@ class VisualisationUtil:
             # noinspection PyTypeChecker
             vis.add_geometry(geom)
 
-        VisualisationUtil.add_axis(vis, np.eye(4), size=axis_size)
+        # noinspection PyTypeChecker
+        vis.add_geometry(VisualisationUtil.make_axes(np.eye(4), size=axis_size))
 
         # Set the initial pose for the visualiser.
         params = vis.get_view_control().convert_to_pinhole_camera_parameters()
