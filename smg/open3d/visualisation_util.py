@@ -30,6 +30,27 @@ class VisualisationUtil:
         return axes
 
     @staticmethod
+    def make_rgbd_image_point_cloud(colour_image: np.ndarray, depth_image: np.ndarray,
+                                    intrinsics: Tuple[float, float, float, float]) -> o3d.geometry.PointCloud:
+        """
+        Make the Open3D point cloud needed to visualise an RGB-D image in 3D.
+
+        :param colour_image:    The colour image.
+        :param depth_image:     The depth image.
+        :param intrinsics:      The camera intrinsics.
+        :return:                The point cloud.
+        """
+        # Make a coloured point cloud from the RGB-D image.
+        depth_mask: np.ndarray = np.where(depth_image != 0, 255, 0).astype(np.uint8)
+        pcd_points, pcd_colours = GeometryUtil.make_point_cloud(colour_image, depth_image, depth_mask, intrinsics)
+
+        # Convert it to Open3D format and return it.
+        pcd: o3d.geometry.PointCloud = o3d.geometry.PointCloud()
+        pcd.points = o3d.utility.Vector3dVector(pcd_points)
+        pcd.colors = o3d.utility.Vector3dVector(pcd_colours)
+        return pcd
+
+    @staticmethod
     def make_trajectory_segments(trajectory: List[Tuple[float, np.ndarray]], *, colour: Tuple[float, float, float]) \
             -> o3d.geometry.LineSet:
         """
@@ -122,14 +143,6 @@ class VisualisationUtil:
         :param depth_image:     The depth image.
         :param intrinsics:      The camera intrinsics.
         """
-        # Make a coloured point cloud from the RGB-D image.
-        depth_mask: np.ndarray = np.where(depth_image != 0, 255, 0).astype(np.uint8)
-        pcd_points, pcd_colours = GeometryUtil.make_point_cloud(colour_image, depth_image, depth_mask, intrinsics)
-
-        # Convert it to Open3D format.
-        pcd: o3d.geometry.PointCloud = o3d.geometry.PointCloud()
-        pcd.points = o3d.utility.Vector3dVector(pcd_points)
-        pcd.colors = o3d.utility.Vector3dVector(pcd_colours)
-
-        # Visualise it.
-        VisualisationUtil.visualise_geometry(pcd)
+        VisualisationUtil.visualise_geometry(
+            VisualisationUtil.make_rgbd_image_point_cloud(colour_image, depth_image, intrinsics)
+        )
