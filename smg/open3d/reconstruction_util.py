@@ -32,7 +32,7 @@ class ReconstructionUtil:
         # noinspection PyArgumentList, PyCallByClass
         rgbd_image = o3d.geometry.RGBDImage.create_from_color_and_depth(
             o3d.geometry.Image(colour_image),
-            o3d.geometry.Image(depth_image),
+            o3d.geometry.Image(depth_image.astype(np.float32)),
             depth_scale=1.0, depth_trunc=depth_trunc, convert_rgb_to_intensity=False
         )
 
