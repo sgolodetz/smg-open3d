@@ -93,12 +93,14 @@ class VisualisationUtil:
         return o3d.geometry.LineSet.create_from_point_cloud_correspondences(pcd1, pcd2, corrs)
 
     @staticmethod
-    def visualise_geometries(geoms: List[o3d.geometry.Geometry], *, axis_size: float = 0.1) -> None:
+    def visualise_geometries(geoms: List[o3d.geometry.Geometry], *, axis_size: float = 0.1,
+                             mesh_show_wireframe: bool = False) -> None:
         """
         Visualise some Open3D geometries.
 
-        :param geoms:       The geometries to visualise.
-        :param axis_size:   The size of the coordinate axes to add.
+        :param geoms:               The geometries to visualise.
+        :param axis_size:           The size of the coordinate axes to add.
+        :param mesh_show_wireframe: Whether or not to show the wireframe triangles for triangle meshes.
         """
         # Set up the visualisation.
         vis = o3d.visualization.Visualizer()
@@ -106,6 +108,7 @@ class VisualisationUtil:
 
         render_option: o3d.visualization.RenderOption = vis.get_render_option()
         render_option.line_width = 10
+        render_option.mesh_show_wireframe = mesh_show_wireframe
 
         for geom in geoms:
             # noinspection PyTypeChecker
