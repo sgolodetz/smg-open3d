@@ -94,12 +94,13 @@ class VisualisationUtil:
 
     @staticmethod
     def visualise_geometries(geoms: List[o3d.geometry.Geometry], *, axis_size: float = 0.1,
-                             mesh_show_wireframe: bool = False) -> None:
+                             initial_pose: np.ndarray = np.eye(4), mesh_show_wireframe: bool = False) -> None:
         """
         Visualise some Open3D geometries.
 
         :param geoms:               The geometries to visualise.
         :param axis_size:           The size of the coordinate axes to add.
+        :param initial_pose:        The initial camera pose.
         :param mesh_show_wireframe: Whether or not to show the wireframe triangles for triangle meshes.
         """
         # Set up the visualisation.
@@ -119,8 +120,7 @@ class VisualisationUtil:
 
         # Set the initial pose for the visualiser.
         params = vis.get_view_control().convert_to_pinhole_camera_parameters()
-        m = np.eye(4)
-        params.extrinsic = m
+        params.extrinsic = initial_pose.copy()
         vis.get_view_control().convert_from_pinhole_camera_parameters(params)
 
         # Run the visualiser.
