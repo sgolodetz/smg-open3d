@@ -51,7 +51,7 @@ class VisualisationUtil:
         return pcd
 
     @staticmethod
-    def make_sphere(position: np.ndarray, radius: float, resolution: int = 20, *,
+    def make_sphere(position, radius: float, resolution: int = 20, *,
                     colour: Optional[Tuple[float, float, float]] = None) -> o3d.geometry.TriangleMesh:
         """
         Make a sphere at the specified position.
@@ -66,7 +66,7 @@ class VisualisationUtil:
         sphere: o3d.geometry.TriangleMesh = o3d.geometry.TriangleMesh.create_sphere(radius, resolution)
         if colour is not None:
             sphere.paint_uniform_color(colour)
-        sphere.translate(position)
+        sphere.translate(np.array(position))
         return sphere
 
     @staticmethod
