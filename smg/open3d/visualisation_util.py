@@ -51,6 +51,25 @@ class VisualisationUtil:
         return pcd
 
     @staticmethod
+    def make_sphere(position, radius: float, resolution: int = 20, *,
+                    colour: Optional[Tuple[float, float, float]] = None) -> o3d.geometry.TriangleMesh:
+        """
+        Make a sphere at the specified position.
+
+        :param position:    The centre of the sphere.
+        :param radius:      The radius of the sphere.
+        :param resolution:  The resolution of the sphere (see the Open3D documentation).
+        :param colour:      An optional colour with which to paint the sphere.
+        :return:            The sphere.
+        """
+        # noinspection PyCallByClass, PyTypeChecker
+        sphere: o3d.geometry.TriangleMesh = o3d.geometry.TriangleMesh.create_sphere(radius, resolution)
+        if colour is not None:
+            sphere.paint_uniform_color(colour)
+        sphere.translate(np.array(position))
+        return sphere
+
+    @staticmethod
     def make_trajectory_segments(trajectory: List[Tuple[float, np.ndarray]], *, colour: Tuple[float, float, float]) \
             -> o3d.geometry.LineSet:
         """
