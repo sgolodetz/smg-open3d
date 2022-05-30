@@ -30,6 +30,20 @@ class VisualisationUtil:
         return axes
 
     @staticmethod
+    def make_obb(corners: List[np.ndarray], *, colour: Tuple[float, float, float]) -> o3d.geometry.LineSet:
+        """TODO"""
+        line_indices: np.ndarray = np.array([
+            [0, 1], [0, 2], [0, 4], [1, 3], [1, 5], [2, 3], [2, 6], [3, 7], [4, 5], [4, 6], [5, 7], [6, 7]
+        ])
+        colours: List[Tuple[float, float, float]] = [colour for _ in range(len(line_indices))]
+        lines: o3d.geometry.LineSet = o3d.geometry.LineSet(
+            points=o3d.utility.Vector3dVector(corners),
+            lines=o3d.utility.Vector2iVector(line_indices),
+        )
+        lines.colors = o3d.utility.Vector3dVector(colours)
+        return lines
+
+    @staticmethod
     def make_rgbd_image_point_cloud(colour_image: np.ndarray, depth_image: np.ndarray,
                                     intrinsics: Tuple[float, float, float, float]) -> o3d.geometry.PointCloud:
         """
